@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
-import { Brain, GraduationCap, Activity, Dumbbell, BookOpen, Clock } from 'lucide-react';
+import { Brain, GraduationCap, Activity, Dumbbell, BookOpen, Scale } from 'lucide-react';
 import { PageType, AgentType } from '../App';
 
 interface DashboardPageProps {
@@ -38,7 +38,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
       </div>
 
       {/* Main Services */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
         {/* Mental Health Assistant Card */}
         <Card hover className="p-8">
           <div className="h-14 w-14 rounded-xl bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center text-white mb-6">
@@ -122,6 +122,49 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
             onClick={() => navigate('career', 'career')}
           >
             Get Career Guidance
+          </Button>
+        </Card>
+
+        {/* Legal Assistant Card */}
+        <Card hover className="p-8">
+          <div className="h-14 w-14 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white mb-6">
+            <Scale className="h-8 w-8" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Legal Assistant</h2>
+          <p className="text-gray-600 mb-6">
+            Confidential legal guidance with jurisdiction-specific advice, document generation, and integration with mental health and career support.
+          </p>
+          
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Features:</h3>
+            <ul className="space-y-2">
+              <li className="flex items-start">
+                <span className="text-amber-500 mr-2">✓</span>
+                <span>Multi-language support</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-amber-500 mr-2">✓</span>
+                <span>Document generation</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-amber-500 mr-2">✓</span>
+                <span>Location-specific advice</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-amber-500 mr-2">✓</span>
+                <span>Integrated support</span>
+              </li>
+            </ul>
+          </div>
+          
+          <Button 
+            variant="primary" 
+            gradientFrom="amber-400" 
+            gradientTo="orange-500"
+            fullWidth
+            onClick={() => navigate('legal', 'legal')}
+          >
+            Get Legal Support
           </Button>
         </Card>
       </div>

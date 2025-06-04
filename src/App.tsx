@@ -6,10 +6,11 @@ import DepressionPage from './pages/DepressionPage';
 import CareerPage from './pages/CareerPage';
 import ResultsPage from './pages/ResultsPage';
 import MentorCallPage from './pages/MentorCallPage';
+import LegalPage from './pages/LegalPage';
 
 // App state types
-export type PageType = 'landing' | 'dashboard' | 'depression' | 'career' | 'results' | 'mentor-call';
-export type AgentType = 'depression' | 'career' | null;
+export type PageType = 'landing' | 'dashboard' | 'depression' | 'career' | 'results' | 'mentor-call' | 'legal';
+export type AgentType = 'depression' | 'career' | 'legal' | null;
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('landing');
@@ -24,7 +25,7 @@ function App() {
       setSelectedAgent(agent);
     }
     // Reset step when navigating to a new page
-    if (page !== 'depression' && page !== 'career') {
+    if (page !== 'depression' && page !== 'career' && page !== 'legal') {
       setStep(1);
     }
   };
@@ -50,6 +51,15 @@ function App() {
           <CareerPage 
             navigate={navigate} 
             setResults={setResults} 
+          />
+        );
+      case 'legal':
+        return (
+          <LegalPage
+            navigate={navigate}
+            step={step}
+            setStep={setStep}
+            setResults={setResults}
           />
         );
       case 'results':
