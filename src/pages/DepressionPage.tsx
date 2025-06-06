@@ -12,35 +12,115 @@ interface DepressionPageProps {
   setResults: (results: any) => void;
 }
 
-// PHQ-9 style questions
+// Comprehensive mental health assessment questions
 const questions = [
   {
     id: 1,
-    text: "Little interest or pleasure in doing things?",
+    text: "Little interest or pleasure in doing things",
+    category: "Depression"
   },
   {
     id: 2,
-    text: "Feeling down, depressed, or hopeless?",
+    text: "Feeling down, depressed, or hopeless",
+    category: "Depression"
   },
   {
     id: 3,
-    text: "Trouble falling or staying asleep, or sleeping too much?",
+    text: "Trouble falling or staying asleep, or sleeping too much",
+    category: "Sleep"
   },
   {
     id: 4,
-    text: "Feeling tired or having little energy?",
+    text: "Feeling tired or having little energy",
+    category: "Energy"
   },
   {
     id: 5,
-    text: "Poor appetite or overeating?",
+    text: "Poor appetite or overeating",
+    category: "Appetite"
+  },
+  {
+    id: 6,
+    text: "Feeling bad about yourself or that you are a failure",
+    category: "Self-Worth"
+  },
+  {
+    id: 7,
+    text: "Trouble concentrating on things",
+    category: "Concentration"
+  },
+  {
+    id: 8,
+    text: "Moving or speaking slowly, or being fidgety/restless",
+    category: "Motor"
+  },
+  {
+    id: 9,
+    text: "Feeling nervous, anxious, or on edge",
+    category: "Anxiety"
+  },
+  {
+    id: 10,
+    text: "Not being able to stop or control worrying",
+    category: "Anxiety"
+  },
+  {
+    id: 11,
+    text: "Worrying too much about different things",
+    category: "Anxiety"
+  },
+  {
+    id: 12,
+    text: "Having trouble relaxing",
+    category: "Relaxation"
+  },
+  {
+    id: 13,
+    text: "Being so restless that it's hard to sit still",
+    category: "Motor"
+  },
+  {
+    id: 14,
+    text: "Becoming easily annoyed or irritable",
+    category: "Irritability"
+  },
+  {
+    id: 15,
+    text: "Feeling afraid as if something awful might happen",
+    category: "Fear"
+  },
+  {
+    id: 16,
+    text: "Thoughts of self-harm or suicide",
+    category: "Crisis"
+  },
+  {
+    id: 17,
+    text: "Difficulty in social situations",
+    category: "Social"
+  },
+  {
+    id: 18,
+    text: "Experiencing panic or fear attacks",
+    category: "Panic"
+  },
+  {
+    id: 19,
+    text: "Feeling detached from reality",
+    category: "Dissociation"
+  },
+  {
+    id: 20,
+    text: "Having unwanted thoughts or memories",
+    category: "Intrusive"
   }
 ];
 
 const options = [
-  { value: 0, label: "Not at all" },
-  { value: 1, label: "Several days" },
-  { value: 2, label: "More than half the days" },
-  { value: 3, label: "Nearly every day" }
+  { value: 0, label: "Not at all", description: "Never or rarely experience this" },
+  { value: 1, label: "Several days", description: "Experience this some days" },
+  { value: 2, label: "More than half the days", description: "Experience this frequently" },
+  { value: 3, label: "Nearly every day", description: "Experience this almost daily" }
 ];
 
 const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep, setResults }) => {
@@ -48,10 +128,12 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
   const [cameraStarted, setCameraStarted] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showCrisisAlert, setShowCrisisAlert] = useState(false);
 
   // Get steps for progress indicator
   const getSteps = () => [
-    { label: 'Questionnaire', completed: step > 1, current: step === 1 },
+    { label: 'Assessment', completed: step > 1, current: step === 1 },
     { label: 'Facial Analysis', completed: step > 2, current: step === 2 },
     { label: 'Results', completed: false, current: step === 3 }
   ];
@@ -62,6 +144,16 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
       ...answers,
       [questionId]: value
     });
+
+    // Check for crisis indicators
+    if (questionId === 16 && value >= 2) {
+      setShowCrisisAlert(true);
+    }
+
+    // Auto-advance to next question
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
   };
 
   // Handle continue to next step
@@ -74,39 +166,103 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
       }
       setStep(2);
     } else if (step === 2) {
-      // Simulate processing
       setAnalyzing(true);
       
-      // Simulate progress for camera analysis
+      // Simulate facial analysis progress
       const interval = setInterval(() => {
         setProgress(prev => {
           if (prev >= 100) {
             clearInterval(interval);
             
-            // When complete, set results and navigate
+            // Calculate comprehensive results
             setTimeout(() => {
-              const mockResult = {
-                riskScore: 35,
-                riskLevel: "Low-Medium Risk",
-                confidence: 87,
-                recommendations: [
-                  "Consider maintaining a mood journal to track daily emotions",
-                  "Practice mindfulness meditation for 10 minutes daily",
-                  "Ensure regular physical activity and adequate sleep",
-                  "Connect with friends or family regularly"
-                ]
-              };
-              
-              setResults(mockResult);
+              const results = calculateResults();
+              setResults(results);
               navigate('results');
             }, 1000);
             
             return 100;
           }
-          return prev + 5;
+          return prev + 2;
         });
-      }, 200);
+      }, 100);
     }
+  };
+
+  // Calculate comprehensive results
+  const calculateResults = () => {
+    // Calculate scores for different categories
+    const categories = {
+      depression: 0,
+      anxiety: 0,
+      sleep: 0,
+      social: 0,
+      panic: 0
+    };
+
+    let totalScore = 0;
+    Object.entries(answers).forEach(([questionId, value]) => {
+      const question = questions.find(q => q.id === parseInt(questionId));
+      if (question) {
+        totalScore += value;
+        switch (question.category) {
+          case 'Depression':
+            categories.depression += value;
+            break;
+          case 'Anxiety':
+            categories.anxiety += value;
+            break;
+          case 'Sleep':
+            categories.sleep += value;
+            break;
+          case 'Social':
+            categories.social += value;
+            break;
+          case 'Panic':
+            categories.panic += value;
+            break;
+        }
+      }
+    });
+
+    return {
+      overallScore: totalScore,
+      riskLevel: getRiskLevel(totalScore),
+      categories: categories,
+      recommendations: generateRecommendations(categories),
+      confidence: 92,
+      needsImmediate: showCrisisAlert
+    };
+  };
+
+  // Get risk level based on score
+  const getRiskLevel = (score: number) => {
+    if (score < 20) return "Low Risk";
+    if (score < 40) return "Moderate Risk";
+    return "High Risk";
+  };
+
+  // Generate personalized recommendations
+  const generateRecommendations = (categories: any) => {
+    const recommendations = [];
+
+    if (categories.depression > 5) {
+      recommendations.push("Consider scheduling a consultation with a mental health professional");
+    }
+    if (categories.anxiety > 5) {
+      recommendations.push("Practice daily mindfulness or meditation exercises");
+    }
+    if (categories.sleep > 2) {
+      recommendations.push("Establish a consistent sleep schedule and bedtime routine");
+    }
+    if (categories.social > 2) {
+      recommendations.push("Gradually increase social interactions in comfortable settings");
+    }
+    if (categories.panic > 2) {
+      recommendations.push("Learn and practice grounding techniques for panic attacks");
+    }
+
+    return recommendations;
   };
 
   // Render the appropriate step
@@ -123,63 +279,138 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
 
   // Questionnaire step
   const renderQuestionnaire = () => {
+    const currentQuestion = questions[currentQuestionIndex];
+
     return (
       <div className="max-w-3xl mx-auto">
         <Card className="p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Mental Health Questionnaire</h2>
-          <p className="text-gray-600 mb-8">
-            Over the last 2 weeks, how often have you been bothered by any of the following problems?
-          </p>
-          
-          <div className="space-y-8">
-            {questions.map((question) => (
-              <div key={question.id} className="bg-gray-50 p-6 rounded-xl">
-                <p className="text-lg font-medium text-gray-800 mb-4">{question.text}</p>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                  {options.map((option) => (
-                    <div 
-                      key={option.value}
-                      className={`
-                        p-3 rounded-lg border-2 cursor-pointer transition-all duration-200
-                        ${answers[question.id] === option.value 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-blue-300'
-                        }
-                      `}
-                      onClick={() => handleOptionSelect(question.id, option.value)}
-                    >
-                      <div className="flex items-center">
-                        <div 
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center
-                            ${answers[question.id] === option.value 
-                              ? 'border-blue-500 bg-blue-500' 
-                              : 'border-gray-400'
-                            }
-                          `}
-                        >
-                          {answers[question.id] === option.value && (
-                            <div className="w-2 h-2 rounded-full bg-white" />
-                          )}
-                        </div>
-                        <span className="ml-2 text-gray-700">{option.label}</span>
-                      </div>
-                    </div>
-                  ))}
+          {/* Progress indicator */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-gray-600">
+                Question {currentQuestionIndex + 1} of {questions.length}
+              </span>
+              <span className="text-sm font-medium text-gray-600">
+                {Math.round((currentQuestionIndex + 1) / questions.length * 100)}% Complete
+              </span>
+            </div>
+            <div className="w-full h-2 bg-gray-200 rounded-full">
+              <div 
+                className="h-full bg-blue-600 rounded-full transition-all duration-300"
+                style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Question */}
+          <div className="bg-gray-50 p-6 rounded-xl mb-8">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {currentQuestion.text}
+            </h3>
+            <p className="text-gray-600">
+              Over the last 2 weeks, how often have you experienced this?
+            </p>
+          </div>
+
+          {/* Options */}
+          <div className="space-y-4">
+            {options.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => handleOptionSelect(currentQuestion.id, option.value)}
+                className={`
+                  w-full p-4 rounded-xl border-2 transition-all duration-200
+                  ${answers[currentQuestion.id] === option.value 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : 'border-gray-200 hover:border-blue-300'
+                  }
+                `}
+              >
+                <div className="flex items-center">
+                  <div 
+                    className={`
+                      w-6 h-6 rounded-full border-2 flex items-center justify-center
+                      ${answers[currentQuestion.id] === option.value 
+                        ? 'border-blue-500 bg-blue-500' 
+                        : 'border-gray-400'
+                      }
+                    `}
+                  >
+                    {answers[currentQuestion.id] === option.value && (
+                      <div className="w-2 h-2 rounded-full bg-white" />
+                    )}
+                  </div>
+                  <div className="ml-3 text-left">
+                    <div className="font-medium text-gray-900">{option.label}</div>
+                    <div className="text-sm text-gray-500">{option.description}</div>
+                  </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
 
-          <div className="mt-8 flex justify-end">
-            <Button 
-              onClick={handleContinue}
-              size="lg"
+          {/* Navigation buttons */}
+          <div className="mt-8 flex justify-between">
+            <Button
+              variant="secondary"
+              onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
+              disabled={currentQuestionIndex === 0}
             >
-              Continue to Facial Analysis
+              Previous
+            </Button>
+            
+            <Button
+              onClick={() => {
+                if (currentQuestionIndex === questions.length - 1) {
+                  handleContinue();
+                } else {
+                  setCurrentQuestionIndex(currentQuestionIndex + 1);
+                }
+              }}
+              disabled={!answers[currentQuestion.id]}
+            >
+              {currentQuestionIndex === questions.length - 1 ? 'Continue to Facial Analysis' : 'Next'}
             </Button>
           </div>
         </Card>
+
+        {/* Crisis Alert */}
+        {showCrisisAlert && (
+          <div className="mt-6">
+            <Card className="p-6 bg-red-50 border-red-200">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-medium text-red-800">
+                    Immediate Support Available
+                  </h3>
+                  <div className="mt-2 text-red-700">
+                    <p>
+                      If you're having thoughts of self-harm or suicide, please know that help is available 24/7:
+                    </p>
+                    <ul className="list-disc list-inside mt-2">
+                      <li>National Crisis Helpline: 988</li>
+                      <li>Crisis Text Line: Text HOME to 741741</li>
+                    </ul>
+                  </div>
+                  <div className="mt-4">
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => window.location.href = 'tel:988'}
+                    >
+                      Call Crisis Helpline
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     );
   };
@@ -302,7 +533,7 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
           <li>
             <span className="mx-2">/</span>
           </li>
-          <li className="font-medium text-gray-900">Mental Health Assistant</li>
+          <li className="font-medium text-gray-900">Mental Health Assessment</li>
         </ol>
       </nav>
 
@@ -310,7 +541,7 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Mental Health Assessment</h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-          Complete the following steps to receive your personalized mental health insights
+          Complete this confidential assessment to receive personalized insights and support
         </p>
       </div>
       
