@@ -79,7 +79,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ navigate, selectedAgent, resu
   function renderDepressionResults() {
     // Color based on risk score
     const getRiskColor = () => {
-      const score = results.riskScore;
+      const score = results?.riskScore || 0;
       if (score < 30) return 'text-green-500';
       if (score < 60) return 'text-yellow-500';
       return 'text-red-500';
@@ -92,13 +92,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ navigate, selectedAgent, resu
             {/* Risk score */}
             <div className="md:w-1/3 mb-8 md:mb-0 flex flex-col items-center justify-center">
               <div className={`text-6xl font-bold ${getRiskColor()}`}>
-                {results.riskScore}
+                {results?.riskScore || 0}
               </div>
               <div className="text-lg font-medium text-gray-800 mt-2">
-                {results.riskLevel}
+                {results?.riskLevel || 'N/A'}
               </div>
               <div className="text-sm text-gray-500 mt-1">
-                {results.confidence}% confidence
+                {results?.confidence || 0}% confidence
               </div>
             </div>
             
@@ -106,7 +106,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ navigate, selectedAgent, resu
             <div className="md:w-2/3 md:pl-8 md:border-l border-gray-200">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Recommendations</h2>
               <ul className="space-y-3">
-                {results.recommendations.map((rec: string, index: number) => (
+                {(results?.recommendations || []).map((rec: string, index: number) => (
                   <li key={index} className="flex items-start">
                     <span className="text-green-500 mr-2">•</span>
                     <span className="text-gray-700">{rec}</span>
@@ -153,6 +153,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ navigate, selectedAgent, resu
   
   // Render career guidance results
   function renderCareerResults() {
+    const careerPaths = results?.careerPaths || [];
+    const nextSteps = results?.nextSteps || [];
+
     return (
       <div className="max-w-3xl mx-auto">
         {/* Career paths */}
@@ -160,7 +163,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ navigate, selectedAgent, resu
           <h2 className="text-xl font-bold text-gray-900 mb-6">Recommended Career Paths</h2>
           
           <div className="space-y-6">
-            {results.careerPaths.map((career: any, index: number) => (
+            {careerPaths.map((career: any, index: number) => (
               <div 
                 key={index} 
                 className="p-6 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-100"
@@ -207,7 +210,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ navigate, selectedAgent, resu
           <h2 className="text-xl font-bold text-gray-900 mb-4">Next Steps</h2>
           
           <ol className="space-y-4">
-            {results.nextSteps.map((step: string, index: number) => (
+            {nextSteps.map((step: string, index: number) => (
               <li key={index} className="flex">
                 <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 text-white font-bold text-sm">
                   {index + 1}
