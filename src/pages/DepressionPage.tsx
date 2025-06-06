@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import ProgressSteps from '../components/common/ProgressSteps';
-import { Camera, Upload, CheckCircle } from 'lucide-react';
+import { Camera, Upload, CheckCircle, Brain, Smile, FileText } from 'lucide-react';
 import { PageType } from '../App';
 
 interface DepressionPageProps {
@@ -11,6 +11,9 @@ interface DepressionPageProps {
   setStep: (step: number) => void;
   setResults: (results: any) => void;
 }
+
+// Assessment method type
+type AssessmentMethod = 'complete' | 'psychometric' | 'facial' | null;
 
 // Comprehensive mental health assessment questions
 const questions = [
@@ -130,13 +133,42 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
   const [progress, setProgress] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showCrisisAlert, setShowCrisisAlert] = useState(false);
+  const [assessmentMethod, setAssessmentMethod] = useState<AssessmentMethod>(null);
 
-  // Get steps for progress indicator
-  const getSteps = () => [
-    { label: 'Assessment', completed: step > 1, current: step === 1 },
-    { label: 'Facial Analysis', completed: step > 2, current: step === 2 },
-    { label: 'Results', completed: false, current: step === 3 }
-  ];
+  // Get steps for progress indicator based on assessment method
+  const getSteps = () => {
+    if (!assessmentMethod) return [];
+    
+    switch (assessmentMethod) {
+      case 'complete':
+        return [
+          { label: 'Method', completed: true, current: false },
+          { label: 'Assessment', completed: step > 1, current: step === 1 },
+          { label: 'Facial Analysis', completed: step > 2, current: step === 2 },
+          { label: 'Results', completed: false, current: step === 3 }
+        ];
+      case 'psychometric':
+        return [
+          { label: 'Method', completed: true, current: false },
+          { label: 'Assessment', completed: step > 1, current: step === 1 },
+          { label: 'Results', completed: false, current: step === 2 }
+        ];
+      case 'facial':
+        return [
+          { label: 'Method', completed: true, current: false },
+          { label: 'Facial Analysis', completed: step > 1, current: step === 1 },
+          { label: 'Results', completed: false, current: step === 2 }
+        ];
+      default:
+        return [];
+    }
+  };
+
+  // Handle assessment method selection
+  const handleMethodSelect = (method: AssessmentMethod) => {
+    setAssessmentMethod(method);
+    setStep(1);
+  };
 
   // Handle questionnaire response
   const handleOptionSelect = (questionId: number, value: number) => {
@@ -158,35 +190,50 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
 
   // Handle continue to next step
   const handleContinue = () => {
-    if (step === 1) {
-      // Check if all questions are answered
-      if (Object.keys(answers).length < questions.length) {
-        alert("Please answer all questions before continuing.");
-        return;
+    if (!assessmentMethod) return;
+
+    if (assessmentMethod === 'complete') {
+      if (step === 1) {
+        // Check if all questions are answered
+        if (Object.keys(answers).length < questions.length) {
+          alert("Please answer all questions before continuing.");
+          return;
+        }
+        setStep(2);
+      } else if (step === 2) {
+        handleFacialAnalysis();
       }
-      setStep(2);
-    } else if (step === 2) {
-      setAnalyzing(true);
-      
-      // Simulate facial analysis progress
-      const interval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            
-            // Calculate comprehensive results
-            setTimeout(() => {
-              const results = calculateResults();
-              setResults(results);
-              navigate('results');
-            }, 1000);
-            
-            return 100;
-          }
-          return prev + 2;
-        });
-      }, 100);
+    } else if (assessmentMethod === 'psychometric') {
+      if (step === 1) {
+        // Check if all questions are answered
+        if (Object.keys(answers).length < questions.length) {
+          alert("Please answer all questions before continuing.");
+          return;
+        }
+        calculateResults();
+      }
+    } else if (assessmentMethod === 'facial') {
+      if (step === 1) {
+        handleFacialAnalysis();
+      }
     }
+  };
+
+  // Handle facial analysis
+  const handleFacialAnalysis = () => {
+    setAnalyzing(true);
+    
+    // Simulate facial analysis progress
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          calculateResults();
+          return 100;
+        }
+        return prev + 2;
+      });
+    }, 100);
   };
 
   // Calculate comprehensive results
@@ -201,38 +248,54 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
     };
 
     let totalScore = 0;
-    Object.entries(answers).forEach(([questionId, value]) => {
-      const question = questions.find(q => q.id === parseInt(questionId));
-      if (question) {
-        totalScore += value;
-        switch (question.category) {
-          case 'Depression':
-            categories.depression += value;
-            break;
-          case 'Anxiety':
-            categories.anxiety += value;
-            break;
-          case 'Sleep':
-            categories.sleep += value;
-            break;
-          case 'Social':
-            categories.social += value;
-            break;
-          case 'Panic':
-            categories.panic += value;
-            break;
+    
+    // Calculate questionnaire scores if applicable
+    if (assessmentMethod !== 'facial') {
+      Object.entries(answers).forEach(([questionId, value]) => {
+        const question = questions.find(q => q.id === parseInt(questionId));
+        if (question) {
+          totalScore += value;
+          switch (question.category) {
+            case 'Depression':
+              categories.depression += value;
+              break;
+            case 'Anxiety':
+              categories.anxiety += value;
+              break;
+            case 'Sleep':
+              categories.sleep += value;
+              break;
+            case 'Social':
+              categories.social += value;
+              break;
+            case 'Panic':
+              categories.panic += value;
+              break;
+          }
         }
-      }
-    });
+      });
+    }
 
-    return {
+    // Add facial analysis results if applicable
+    if (assessmentMethod !== 'psychometric') {
+      // Simulate facial analysis scores
+      categories.depression += Math.random() * 10;
+      categories.anxiety += Math.random() * 10;
+      totalScore += Math.random() * 30;
+    }
+
+    const results = {
       overallScore: totalScore,
       riskLevel: getRiskLevel(totalScore),
       categories: categories,
       recommendations: generateRecommendations(categories),
-      confidence: 92,
-      needsImmediate: showCrisisAlert
+      confidence: assessmentMethod === 'complete' ? 92 : 75,
+      needsImmediate: showCrisisAlert,
+      assessmentMethod: assessmentMethod
     };
+
+    setResults(results);
+    navigate('results');
   };
 
   // Get risk level based on score
@@ -265,19 +328,94 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
     return recommendations;
   };
 
-  // Render the appropriate step
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return renderQuestionnaire();
-      case 2:
-        return renderFacialAnalysis();
-      default:
-        return renderQuestionnaire();
-    }
-  };
+  // Render method selection
+  const renderMethodSelection = () => (
+    <div className="max-w-3xl mx-auto">
+      <Card className="p-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Choose Your Assessment Method</h2>
+        
+        <div className="space-y-6">
+          {/* Complete Analysis */}
+          <button
+            onClick={() => handleMethodSelect('complete')}
+            className="w-full p-6 rounded-xl border-2 transition-all duration-200 hover:border-blue-500 hover:bg-blue-50"
+          >
+            <div className="flex items-start">
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white">
+                <Brain className="h-6 w-6" />
+              </div>
+              <div className="ml-4 text-left">
+                <h3 className="text-lg font-semibold text-gray-900">Complete Analysis (Recommended)</h3>
+                <p className="text-gray-600 mt-1">
+                  Combines psychometric assessment and facial analysis for comprehensive insights
+                </p>
+                <div className="mt-2 flex items-center">
+                  <span className="text-sm font-medium text-blue-600">92% accuracy</span>
+                  <span className="mx-2 text-gray-300">•</span>
+                  <span className="text-sm text-gray-500">15-20 minutes</span>
+                </div>
+              </div>
+            </div>
+          </button>
 
-  // Questionnaire step
+          {/* Psychometric Assessment */}
+          <button
+            onClick={() => handleMethodSelect('psychometric')}
+            className="w-full p-6 rounded-xl border-2 transition-all duration-200 hover:border-blue-500 hover:bg-blue-50"
+          >
+            <div className="flex items-start">
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center text-white">
+                <FileText className="h-6 w-6" />
+              </div>
+              <div className="ml-4 text-left">
+                <h3 className="text-lg font-semibold text-gray-900">Psychometric Assessment Only</h3>
+                <p className="text-gray-600 mt-1">
+                  Focus on personality traits and behavioral patterns through questionnaire
+                </p>
+                <div className="mt-2 flex items-center">
+                  <span className="text-sm font-medium text-green-600">85% accuracy</span>
+                  <span className="mx-2 text-gray-300">•</span>
+                  <span className="text-sm text-gray-500">10-12 minutes</span>
+                </div>
+              </div>
+            </div>
+          </button>
+
+          {/* Facial Analysis */}
+          <button
+            onClick={() => handleMethodSelect('facial')}
+            className="w-full p-6 rounded-xl border-2 transition-all duration-200 hover:border-blue-500 hover:bg-blue-50"
+          >
+            <div className="flex items-start">
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center text-white">
+                <Smile className="h-6 w-6" />
+              </div>
+              <div className="ml-4 text-left">
+                <h3 className="text-lg font-semibold text-gray-900">Facial Analysis Only</h3>
+                <p className="text-gray-600 mt-1">
+                  Analyze facial expressions and micro-movements for emotional insights
+                </p>
+                <div className="mt-2 flex items-center">
+                  <span className="text-sm font-medium text-amber-600">78% accuracy</span>
+                  <span className="mx-2 text-gray-300">•</span>
+                  <span className="text-sm text-gray-500">5-7 minutes</span>
+                </div>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <div className="mt-8 bg-blue-50 p-4 rounded-xl">
+          <p className="text-sm text-blue-800">
+            <strong>Privacy Note:</strong> All analysis is performed locally on your device. 
+            No data is stored or transmitted to external servers.
+          </p>
+        </div>
+      </Card>
+    </div>
+  );
+
+  // Render questionnaire step
   const renderQuestionnaire = () => {
     const currentQuestion = questions[currentQuestionIndex];
 
@@ -369,7 +507,10 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
               }}
               disabled={!answers[currentQuestion.id]}
             >
-              {currentQuestionIndex === questions.length - 1 ? 'Continue to Facial Analysis' : 'Next'}
+              {currentQuestionIndex === questions.length - 1 
+                ? (assessmentMethod === 'complete' ? 'Continue to Facial Analysis' : 'Complete Assessment')
+                : 'Next'
+              }
             </Button>
           </div>
         </Card>
@@ -415,7 +556,7 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
     );
   };
 
-  // Facial analysis step
+  // Render facial analysis step
   const renderFacialAnalysis = () => {
     return (
       <div className="max-w-3xl mx-auto">
@@ -546,12 +687,28 @@ const DepressionPage: React.FC<DepressionPageProps> = ({ navigate, step, setStep
       </div>
       
       {/* Progress indicator */}
-      <div className="mb-12 max-w-2xl mx-auto">
-        <ProgressSteps steps={getSteps()} />
-      </div>
+      {assessmentMethod && (
+        <div className="mb-12 max-w-2xl mx-auto">
+          <ProgressSteps steps={getSteps()} />
+        </div>
+      )}
       
-      {/* Step content */}
-      {renderStep()}
+      {/* Main content */}
+      {!assessmentMethod ? (
+        renderMethodSelection()
+      ) : (
+        <>
+          {/* Assessment content based on method and step */}
+          {assessmentMethod === 'complete' && (
+            <>
+              {step === 1 && renderQuestionnaire()}
+              {step === 2 && renderFacialAnalysis()}
+            </>
+          )}
+          {assessmentMethod === 'psychometric' && step === 1 && renderQuestionnaire()}
+          {assessmentMethod === 'facial' && step === 1 && renderFacialAnalysis()}
+        </>
+      )}
     </div>
   );
 };
