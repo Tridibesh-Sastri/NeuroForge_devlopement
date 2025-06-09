@@ -7,9 +7,10 @@ import CareerPage from './pages/CareerPage';
 import ResultsPage from './pages/ResultsPage';
 import MentorCallPage from './pages/MentorCallPage';
 import LegalPage from './pages/LegalPage';
+import PsychometricPage from './pages/PsychometricPage';
 
 // App state types
-export type PageType = 'landing' | 'dashboard' | 'depression' | 'career' | 'results' | 'mentor-call' | 'legal';
+export type PageType = 'landing' | 'dashboard' | 'depression' | 'career' | 'results' | 'mentor-call' | 'legal' | 'psychometric';
 export type AgentType = 'depression' | 'career' | 'legal' | null;
 
 function App() {
@@ -62,6 +63,8 @@ function App() {
             setResults={setResults}
           />
         );
+      case 'psychometric':
+        return <PsychometricPage navigate={navigate} />;
       case 'results':
         return (
           <ResultsPage 

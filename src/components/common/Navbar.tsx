@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, LayoutGrid, Home, Brain, GraduationCap } from 'lucide-react';
+import { Menu, X, LayoutGrid, Home, Brain, GraduationCap, FileText } from 'lucide-react';
 import { PageType, AgentType } from '../../App';
 
 interface NavbarProps {
@@ -19,6 +19,7 @@ const Navbar: React.FC<NavbarProps> = ({ navigate, currentPage }) => {
     { name: 'Dashboard', page: 'dashboard' as PageType, icon: <LayoutGrid className="w-5 h-5 mr-2" /> },
     { name: 'Mental Health', page: 'depression' as PageType, icon: <Brain className="w-5 h-5 mr-2" /> },
     { name: 'Career Guidance', page: 'career' as PageType, icon: <GraduationCap className="w-5 h-5 mr-2" /> },
+    { name: 'Psychometric', page: 'psychometric' as PageType, icon: <FileText className="w-5 h-5 mr-2" /> },
   ];
 
   return (
@@ -64,9 +65,9 @@ const Navbar: React.FC<NavbarProps> = ({ navigate, currentPage }) => {
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-blue-50 focus:outline-none"
             >
               {isMenuOpen ? (
-                <X className="block h-6 w-6\" aria-hidden="true" />
+                <X className="block h-6 w-6" aria-hidden="true" />
               ) : (
-                <Menu className="block h-6 w-6\" aria-hidden="true" />
+                <Menu className="block h-6 w-6" aria-hidden="true" />
               )}
             </button>
           </div>

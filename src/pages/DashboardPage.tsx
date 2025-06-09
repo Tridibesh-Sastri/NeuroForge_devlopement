@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
-import { Brain, GraduationCap, Activity, Dumbbell, BookOpen, Scale } from 'lucide-react';
+import { Brain, GraduationCap, Activity, Dumbbell, BookOpen, Scale, FileText } from 'lucide-react';
 import { PageType, AgentType } from '../App';
 
 interface DashboardPageProps {
@@ -38,20 +38,20 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
       </div>
 
       {/* Main Services */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
         {/* Mental Health Assistant Card */}
         <Card hover className="p-8">
           <div className="h-14 w-14 rounded-xl bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center text-white mb-6">
             <Brain className="h-8 w-8" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Mental Health Assistant</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-3">Mental Health Assistant</h2>
           <p className="text-gray-600 mb-6">
-            Advanced AI analysis combining facial expression recognition and psychometric assessment to help monitor and improve your mental well-being.
+            Advanced AI analysis combining facial expression recognition and psychometric assessment.
           </p>
           
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Features:</h3>
-            <ul className="space-y-2">
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-800 mb-2">Features:</h3>
+            <ul className="space-y-1 text-sm">
               <li className="flex items-start">
                 <span className="text-green-500 mr-2">✓</span>
                 <span>Facial expression analysis</span>
@@ -59,10 +59,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
               <li className="flex items-start">
                 <span className="text-green-500 mr-2">✓</span>
                 <span>Psychometric questionnaire</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-green-500 mr-2">✓</span>
-                <span>Personalized recommendations</span>
               </li>
               <li className="flex items-start">
                 <span className="text-green-500 mr-2">✓</span>
@@ -87,14 +83,14 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
           <div className="h-14 w-14 rounded-xl bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center text-white mb-6">
             <GraduationCap className="h-8 w-8" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Career Guidance Assistant</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-3">Career Guidance Assistant</h2>
           <p className="text-gray-600 mb-6">
-            AI-powered career counseling with personalized recommendations, video insights, and the opportunity to connect with live mentors in your field.
+            AI-powered career counseling with personalized recommendations and mentor connections.
           </p>
           
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Features:</h3>
-            <ul className="space-y-2">
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-800 mb-2">Features:</h3>
+            <ul className="space-y-1 text-sm">
               <li className="flex items-start">
                 <span className="text-purple-500 mr-2">✓</span>
                 <span>Career matching</span>
@@ -106,10 +102,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
               <li className="flex items-start">
                 <span className="text-purple-500 mr-2">✓</span>
                 <span>Live mentor sessions</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-purple-500 mr-2">✓</span>
-                <span>Personalized action plan</span>
               </li>
             </ul>
           </div>
@@ -130,14 +122,14 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
           <div className="h-14 w-14 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white mb-6">
             <Scale className="h-8 w-8" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Legal Assistant</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-3">Legal Assistant</h2>
           <p className="text-gray-600 mb-6">
-            Confidential legal guidance with jurisdiction-specific advice, document generation, and integration with mental health and career support.
+            Confidential legal guidance with jurisdiction-specific advice and document generation.
           </p>
           
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Features:</h3>
-            <ul className="space-y-2">
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-800 mb-2">Features:</h3>
+            <ul className="space-y-1 text-sm">
               <li className="flex items-start">
                 <span className="text-amber-500 mr-2">✓</span>
                 <span>Multi-language support</span>
@@ -150,10 +142,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
                 <span className="text-amber-500 mr-2">✓</span>
                 <span>Location-specific advice</span>
               </li>
-              <li className="flex items-start">
-                <span className="text-amber-500 mr-2">✓</span>
-                <span>Integrated support</span>
-              </li>
             </ul>
           </div>
           
@@ -165,6 +153,45 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ navigate }) => {
             onClick={() => navigate('legal', 'legal')}
           >
             Get Legal Support
+          </Button>
+        </Card>
+
+        {/* Psychometric Assessment Card */}
+        <Card hover className="p-8">
+          <div className="h-14 w-14 rounded-xl bg-gradient-to-r from-indigo-400 to-cyan-500 flex items-center justify-center text-white mb-6">
+            <FileText className="h-8 w-8" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-3">Psychometric Assessment</h2>
+          <p className="text-gray-600 mb-6">
+            Comprehensive psychological evaluation with detailed analytics and insights.
+          </p>
+          
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-800 mb-2">Features:</h3>
+            <ul className="space-y-1 text-sm">
+              <li className="flex items-start">
+                <span className="text-indigo-500 mr-2">✓</span>
+                <span>20-question assessment</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-indigo-500 mr-2">✓</span>
+                <span>4 psychological dimensions</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-indigo-500 mr-2">✓</span>
+                <span>Detailed analytics</span>
+              </li>
+            </ul>
+          </div>
+          
+          <Button 
+            variant="primary" 
+            gradientFrom="indigo-400" 
+            gradientTo="cyan-500"
+            fullWidth
+            onClick={() => navigate('psychometric')}
+          >
+            Take Assessment
           </Button>
         </Card>
       </div>
