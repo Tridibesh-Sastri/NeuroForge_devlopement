@@ -59,11 +59,11 @@ const Button: React.FC<ButtonProps> = ({
 
   // Non-gradient button styles
   const variantClasses = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
-    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800',
-    success: 'bg-green-500 hover:bg-green-600 text-white',
-    warning: 'bg-yellow-500 hover:bg-yellow-600 text-white',
-    danger: 'bg-red-500 hover:bg-red-600 text-white',
+    primary: 'bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-600',
+    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200',
+    success: 'bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-500',
+    warning: 'bg-yellow-500 hover:bg-yellow-600 text-white dark:bg-yellow-600 dark:hover:bg-yellow-500',
+    danger: 'bg-red-500 hover:bg-red-600 text-white dark:bg-red-600 dark:hover:bg-red-500',
   };
 
   const baseClasses = `

@@ -25,20 +25,21 @@ const Card: React.FC<CardProps> = ({
   
   const gradientClasses = gradient 
     ? `bg-gradient-to-${direction} from-${gradient.from} to-${gradient.to}` 
-    : 'bg-white';
+    : 'bg-white dark:bg-gray-800';
   
   const hoverClasses = hover 
     ? 'transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer' 
     : '';
   
   const borderClasses = border && !gradient
-    ? 'border border-gray-200'
+    ? 'border border-gray-200 dark:border-gray-700'
     : '';
 
   return (
     <div
       className={`
-        rounded-2xl shadow-lg ${gradientClasses} ${hoverClasses} ${borderClasses} ${className}
+        rounded-2xl shadow-lg ${gradientClasses} ${hoverClasses} ${borderClasses} 
+        transition-colors duration-300 ${className}
       `}
       onClick={onClick}
     >
